@@ -15,6 +15,7 @@ import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
+from .restapis import get_request, post_review, analyze_review_sentiments
 
 
 # Get an instance of a logger
@@ -117,12 +118,15 @@ def get_dealer_reviews(request, dealer_id):
 
 # Create a `get_dealer_details` view to render the dealer details
 def get_dealer_details(request, dealer_id):
-    if(dealer_id):
+    if dealer_id:
         endpoint = "/fetchDealer/"+str(dealer_id)
         dealership = get_request(endpoint)
+        if isinstance(dealership, list) and len(dealership) > 0:
+            dealership = dealership[0]  # take the first dealer object
         return JsonResponse({"status":200,"dealer":dealership})
     else:
         return JsonResponse({"status":400,"message":"Bad Request"})
+
 
 # Create a `add_review` view to submit a review
 def add_review(request):
